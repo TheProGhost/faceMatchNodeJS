@@ -8,16 +8,16 @@ const imgSize = require('image-size');
 //  configure face-api.js
 faceapi.env.monkeyPatch({Canvas, Image, fetch : fetch.bind(global)});
 
-let run = async () => {
+let run = async (callback) => {
     try{
-        let image1 = fs.readFileSync('./keanu_reevs.jpg');
+        let image1;
+        fs.readdirSync('./single').forEach(file => {
+            image1 = fs.readFileSync(`./single/${file}`);
+        })
+         
         // let dimention1 = imgSize(image1);
         image1 = await loadImage(image1);
-
-
-        // let image2 = fs.readFileSync('./keanu_reevs_check.jpg');
-        // let image_2 = await loadImage(image2);
-
+        
         // loading models
         await faceapi.nets.ssdMobilenetv1.loadFromDisk(MODEL_URL);
         await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_URL);
@@ -54,25 +54,14 @@ let run = async () => {
                 }
             }
         };
-        return "Lol completed";
+        callback(null);
     }
     
     catch(err){
         console.log(err);
-        return err;
-    }
-    
-    // finally{
-    //     console.log("File execution completed");
-    // }
-    
+        callback(err)
+        // return;
+    }    
 };
-
-
-// let a = run();
-// console.log(a);
-// process.on('exit', () => {
-//     console.log("Done working");
-// })
 
 module.exports = run;
